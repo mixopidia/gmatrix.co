@@ -1,0 +1,41 @@
+﻿require("dotenv").config();
+
+const express  = require("express");
+const corsMW   = require("./middleware/cors");
+const connectDB = require("./config/db");
+
+const app = express();
+
+// Core middleware
+app.use(express.json());
+app.use(corsMW);
+
+// Connect DB
+connectDB();
+
+// Helper to mount routes safely (won't crash if a file is missing)
+function mount(prefix, modPath) {
+  try {
+    app.use(prefix, require(modPath));
+    console.log(`Mounted ${prefix} -> ${modPath}`);
+  } catch (e) {
+    console.warn(`⚠️  Skipped ${prefix} (${modPath}): ${e.message}`);
+  }
+}
+
+// Routes
+mount("/api/admin",       "./routes/adminRoutes");
+mount("/api/auth",        "./routes/authRoutes");
+mount("/api/wallet",      "./routes/walletRoutes");
+mount("/api/orders",      "./routes/orderRoutes");
+mount("/api/market-data", "./routes/marketPublicRoutes");
+mount("/api/markets",     "./routes/marketRoutes"); // list seeded markets
+
+// Health
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+

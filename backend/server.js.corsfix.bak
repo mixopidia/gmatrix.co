@@ -1,0 +1,38 @@
+﻿const express = require('express');
+const corsMW = require('./middleware/cors');
+const cors = require('cors');
+const corsMW = require('./middleware/cors');
+const dotenv = require('dotenv');
+const corsMW = require('./middleware/cors');
+const connectDB = require('./config/db');
+
+dotenv.config();
+const corsMW = require('./middleware/cors');
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(corsMW); app.options('*', corsMW);
+
+// Connect DB
+connectDB();
+
+// Routes
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/wallet', require('./routes/walletRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/markets', require('./routes/marketRoutes'));
+
+app.use('/api/market-data', require('./routes/marketPublicRoutes'));  // <-- Add this line
+
+// Health check
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+// Start server
+const corsMW = require('./middleware/cors');
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+

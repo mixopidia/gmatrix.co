@@ -1,0 +1,42 @@
+﻿import React, { useState } from "react";
+import { withdraw } from "../lib/api";
+
+export default function Withdraw() {
+  const [asset, setAsset] = useState("USDT");
+  const [amount, setAmount] = useState("");
+  const [address, setAddress] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await withdraw({ asset, amount, address });
+      setMessage("✅ Withdrawal submitted: " + JSON.stringify(res.data));
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Error: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  return (
+    <div className="withdraw-page">
+      <h2>Withdraw</h2>
+      <form onSubmit={handleWithdraw}>
+        <div>
+          <label>Asset</label>
+          <input value={asset} onChange={(e) => setAsset(e.target.value)} />
+        </div>
+        <div>
+          <label>Amount</label>
+          <input value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </div>
+        <div>
+          <label>Destination Address</label>
+          <input value={address} onChange={(e) => setAddress(e.target.value)} />
+        </div>
+        <button type="submit">Submit Withdraw</button>
+      </form>
+      {message && <p>{message}</p>}
+    </div>
+  );
+}

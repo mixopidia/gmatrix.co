@@ -1,0 +1,7 @@
+﻿import React from "react";
+import useTicker from "@/hooks/useTicker";
+
+export default function MarketPriceCell({ symbol }) {
+  const t = useTicker(symbol); // e.g., "BTC/USDT" or "BTCUSDT"
+  return <span>{t?.price ? Number(t.price).toLocaleString() : "-"}</span>;
+}

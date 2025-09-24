@@ -1,0 +1,22 @@
+﻿import { useEffect, useRef, useState } from "react";
+import { getTicker, getCurrentPair, onPairChange, normalizeSymbol } from "@/lib/api";
+
+/** Tracks a symbol (or the current pair) and updates every 2s */
+export default function useTicker(symbol) {
+  const [tick, setTick] = useState(null);
+  const symRef = useRef(symbol ? normalizeSymbol(symbol) : normalizeSymbol(getCurrentPair()));
+
+  async function pull(s) {
+    try { const t = await getTicker(s); if (t?.symbol) setTick(t); } catch {}
+  }
+
+  useEffect(() => {
+    if (symbol) symRef.current = normalizeSymbol(symbol);
+    pull(symRef.current);
+    const unsub = onPairChange((p) => { if (!symbol) { symRef.current = normalizeSymbol(p); pull(symRef.current); }});
+    const id = setInterval(() => pull(symRef.current), 2000);
+    return () => { unsub?.(); clearInterval(id); };
+  }, [symbol]);
+
+  return tick; // { symbol, price, raw }
+}
